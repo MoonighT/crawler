@@ -4,12 +4,28 @@ import bs4
 import re
 from bs4 import BeautifulSoup
 from dateutil import parser
+from nltk.tokenize import sent_tokenize
+
+def strip_lower(s):
+    return s.lower().strip()
 
 class Options:
     def __init__(self, url = "", title = "", size = 0):
         self.url = url
         self.title = title
         self.size = size
+
+class SGfood_blog:
+    def __init__(self):
+        self.date = None 
+        self.title = ''
+        self.content = ''
+
+    def parse(self,blog):
+        date_tag = blog.find("h2","date-header")
+        self.date = parser.parse(date_tag.string)
+        self.title = blog.find("h3","post-title entry-title").a.string.strip().encode('ascii', 'ignore')
+        self.content = blog.find("div","post-body entry-content").text.strip().encode('ascii', 'ignore')
 
 class SGfood:
     def __init__(self):
@@ -55,8 +71,9 @@ def parse_one_page(br,count,url=""):
         #crawl whole page and go to next page
         for blog in blog_div:
             #crawl one blog item
-            date_tag = blog.find("h2","date-header")
-            result.append(parser.parse(date_tag.string))
+            sg_blog = SGfood_blog()
+            sg_blog.parse(blog)
+            result.append(sg_blog)
         #go to next page with count = count - len(blog_div) 
         next_result = parse_one_page(br,count-len(blog_div))
         if next_result != None:
@@ -69,14 +86,18 @@ def parse_one_page(br,count,url=""):
             if i>= count:
                 break
             else:
-                date_tag = blog.find("h2","date-header")
-                result.append(parser.parse(date_tag.string))
+                sg_blog = SGfood_blog()
+                sg_blog.parse(blog)
+                result.append(sg_blog)
     return result    
        
    
 def parse_one_opt(opt,br):
     opt_result = parse_one_page(br, opt.size, opt.url)
-    print opt_result
+    for blog in opt_result:
+        print blog.title
+        print blog.date
+        print blog.content
 
 def parse_sgfood(sgfood):
     br = mechanize.Browser()
@@ -88,7 +109,7 @@ def parse_sgfood(sgfood):
     #crawl new stuff
     for opt in sgfood.options:
         parse_one_opt(opt,br)
-        break
+    #    break
 
 def crawl():
    #crawl sgfood website
