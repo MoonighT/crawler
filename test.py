@@ -155,32 +155,32 @@ class DanielFood:
         soup = BeautifulSoup(html)
         daniel_blog = DanielFood_blog()
         daniel_blog.parse(soup.body)
-        print daniel_blog.title
-        print daniel_blog.date
-        print daniel_blog.content
+        return daniel_blog
 
     def parse_one_page(self, br, url):
         result = []
         
         #if there is url, means the first time go in the page, 
         #else just click the older page text to get new page
-        if url == "":
-            req = br.click_link(text="Older Posts")
-            r = br.open(req)
-        else:
-            r = br.open(url)
+        r = br.open(url)
         
         links = list(br.links(text_regex=re.compile("Continue Reading")))
         for link in links:
             blog = self.parse_one_blog(br,link)
+            br.back()
             result.append(blog)
-
         #get next page context
+        links = list(br.links(text_regex=re.compile(r'\w*Older posts')))
+        if len(links) >= 1:
+            result.extend(self.parse_one_page(br,links[0].url))
         return result
 
     def parse_one_opt(self,br,opt):
         results = self.parse_one_page(br, opt.url)
-        print results
+        for r in results:
+            print r.date
+            print r.title
+            print r.content
 
     def parse(self):
         br = mechanize.Browser()
@@ -190,8 +190,7 @@ class DanielFood:
 
         for opt in self.options:
             self.parse_one_opt(br, opt)
-            break
-
+            #break
 def crawl():
     #crawl sgfood website
     #sgfood = SGfood()
