@@ -4,6 +4,8 @@ import re
 from bs4 import BeautifulSoup
 from blog_model import SGfood_blog
 from Options import Options
+from nltk.tokenize import word_tokenize,sent_tokenize
+
 class SGfood:
     def __init__(self):
         self.url = "http://www.sgfoodonfoot.com/"
@@ -66,13 +68,20 @@ class SGfood:
                     result.append(sg_blog)
         return result    
            
-       
+    
+    def generate_token(self, content):
+        return [word_tokenize(t) for t in sent_tokenize(content)]
+
     def parse_one_opt(self,opt,br):
         opt_result = self.parse_one_page(br, opt.size, opt.url)
         for blog in opt_result:
-            print blog.title
-            print blog.date
-            print blog.content
+            #get content in token form
+            sent_list = self.generate_token(blog.content)
+            for sent in sent_list:
+                for word in sent:
+                    print word,' O'
+                print    
+            print
 
     def parse_sgfood(self):
         br = mechanize.Browser()
@@ -84,4 +93,4 @@ class SGfood:
         #crawl new stuff
         for opt in self.options:
             self.parse_one_opt(opt,br)
-        #    break
+            #break

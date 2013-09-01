@@ -2,7 +2,7 @@ import os
 from time import time
 from sgfood import SGfood
 from danielfood import DanielFood
-#from nltk.tokenize import sent_tokenize
+
 
         
 def crawl():
