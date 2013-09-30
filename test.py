@@ -13,7 +13,7 @@ def crawl():
     #danielfood.parse()
 
 if __name__ == "__main__":
-    t0 = time()
+    #t0 = time()
     crawl() 
-    t1 = time()
-    print 'function crawl takes %f' %(t1-t0)
+    #t1 = time()
+    #print 'function crawl takes %f' %(t1-t0)

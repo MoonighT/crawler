@@ -4,7 +4,7 @@ import re
 from bs4 import BeautifulSoup
 from blog_model import SGfood_blog
 from Options import Options
-from nltk.tokenize import word_tokenize,sent_tokenize
+
 
 class SGfood:
     def __init__(self):
@@ -52,6 +52,7 @@ class SGfood:
                 sg_blog.parse(blog)
                 result.append(sg_blog)
             #go to next page with count = count - len(blog_div) 
+
             next_result = self.parse_one_page(br,count-len(blog_div))
             if next_result != None:
                 result.extend(next_result)
@@ -68,16 +69,14 @@ class SGfood:
                     result.append(sg_blog)
         return result    
            
-    
-    def generate_token(self, content):
-        return [word_tokenize(t) for t in sent_tokenize(content)]
 
     def parse_one_opt(self,opt,br):
         opt_result = self.parse_one_page(br, opt.size, opt.url)
+
+        #generate training file !!!
         for blog in opt_result:
             #get content in token form
-            sent_list = self.generate_token(blog.content)
-            for sent in sent_list:
+            for sent in blog.content:
                 for word in sent:
                     print word,' O'
                 print    
@@ -93,4 +92,3 @@ class SGfood:
         #crawl new stuff
         for opt in self.options:
             self.parse_one_opt(opt,br)
-            #break
